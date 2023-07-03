@@ -5,7 +5,7 @@
 namespace REACTBIGBANG.Migrations
 {
     /// <inheritdoc />
-    public partial class Start : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,8 @@ namespace REACTBIGBANG.Migrations
                     Specialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Doctor_gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Doctor_experience = table.Column<int>(type: "int", nullable: false),
-                    Doctor_password = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Doctor_Password = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -47,30 +48,31 @@ namespace REACTBIGBANG.Migrations
                 columns: table => new
                 {
                     Patient_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("SqlServer:Identity", "201, 1"),
+                    Doctor_id = table.Column<int>(type: "int", nullable: false),
                     Patient_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Patient_age = table.Column<int>(type: "int", nullable: false),
                     Patient_gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Medical_treatment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Patient_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phonenumber = table.Column<long>(type: "bigint", nullable: false),
-                    Patient_password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DoctorsDoctor_id = table.Column<int>(type: "int", nullable: true)
+                    Patient_Password = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_patients", x => x.Patient_id);
                     table.ForeignKey(
-                        name: "FK_patients_doctors_DoctorsDoctor_id",
-                        column: x => x.DoctorsDoctor_id,
+                        name: "FK_patients_doctors_Doctor_id",
+                        column: x => x.Doctor_id,
                         principalTable: "doctors",
-                        principalColumn: "Doctor_id");
+                        principalColumn: "Doctor_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_patients_DoctorsDoctor_id",
+                name: "IX_patients_Doctor_id",
                 table: "patients",
-                column: "DoctorsDoctor_id");
+                column: "Doctor_id");
         }
 
         /// <inheritdoc />

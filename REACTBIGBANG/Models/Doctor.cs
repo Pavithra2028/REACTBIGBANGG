@@ -18,9 +18,10 @@ namespace REACTBIGBANG.Models
 
        public int Doctor_experience { get; set; }
 
-       public string? Doctor_password { get; set; }
+       public string? Status { get; set; }
 
-       public ICollection<Patient>? Patients { get; set; }
+       public string? Doctor_Password { get; set; }
 
+        public ICollection<Patient>? patients { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace REACTBIGBANG.Models
 {
@@ -7,6 +8,11 @@ namespace REACTBIGBANG.Models
         [Key]
 
         public int Patient_id { get; set; }
+        //[ForeignKey("Doctor")]
+
+        public int Doctor_id { get; set; }
+        [ForeignKey("Doctor_id")]
+        public Doctor? Doctors { get; set; }
 
         public string? Patient_name { get; set; }
 
@@ -20,8 +26,8 @@ namespace REACTBIGBANG.Models
 
         public long Phonenumber { get; set; }
 
-        public string? Patient_password { get; set; }
+        public string? Patient_Password { get; set; }
 
-        public Doctor? Doctors { get; set; }
+        //public Doctor? Doctors { get; set; }
     }
 }

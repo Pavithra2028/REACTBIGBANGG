@@ -1,9 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using REACTBIGBANG.Models;
+using REACTBIGBANG.Models.Dto;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace REACTBIGBANG.Repository
 {
-    public class DoctorRepository:IDoctorRepository
+    public class DoctorRepository : IDoctorRepository
     {
         private readonly HospitalContext hospitalContext;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -14,9 +23,10 @@ namespace REACTBIGBANG.Repository
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public IEnumerable<Doctor> GetDoctor()
+        public ICollection<Doctor> GetDoctor()
         {
-            return hospitalContext.doctors.ToList();
+            var user = hospitalContext.doctors.Include(x => x.patients).ToList();
+            return user;
         }
 
         public Doctor DoctorById(int Doctor_id)
@@ -48,7 +58,7 @@ namespace REACTBIGBANG.Repository
             }
 
             doctor.Doctor_image = fileName;
-
+            doctor.Status = "Not Admitted";
             hospitalContext.doctors.Add(doctor);
             await hospitalContext.SaveChangesAsync();
 
@@ -88,12 +98,64 @@ namespace REACTBIGBANG.Repository
             existingDoctor.Specialization = doctor.Specialization;
             existingDoctor.Doctor_gender = doctor.Doctor_gender;
             existingDoctor.Doctor_experience = doctor.Doctor_experience;
-            existingDoctor.Doctor_password = doctor.Doctor_password;
             await hospitalContext.SaveChangesAsync();
 
             return existingDoctor;
         }
 
+        public async Task<Models.Dto.UpdateStatus> UpdateStatus(Models.Dto.UpdateStatus status)
+        {
+            var doc = await hospitalContext.doctors.FirstOrDefaultAsync(s => s.Doctor_id == status.id);
+            if (doc != null)
+            {
+                if (doc.Status == "Not Admitted")
+                {
+                    doc.Status = "Accepted";
+                    await hospitalContext.SaveChangesAsync();
+                    return status;
+                }
+                return status;
+
+            }
+            return null;
+        }
+
+        public async Task<Models.Dto.UpdateStatus> DeclineDoctorStatus(Models.Dto.UpdateStatus status)
+        {
+            var doc = await hospitalContext.doctors.FirstOrDefaultAsync(s => s.Doctor_id == status.id);
+            if (doc != null)
+            {
+                if (doc.Status == "Not Admitted")
+                {
+                    doc.Status = "Declined";
+                    await hospitalContext.SaveChangesAsync();
+                    return status;
+                }
+                return status;
+
+            }
+            return null;
+        }
+
+        public async Task<ICollection<Doctor>> RequestedDoctor()
+        {
+            var doc = await hospitalContext.doctors.Where(s => s.Status == "Not Admitted").ToListAsync();
+            if (doc != null)
+            {
+                return doc;
+            }
+            return null;
+        }
+
+        public async Task<ICollection<Doctor>> AcceptedDoctor()
+        {
+            var doc = await hospitalContext.doctors.Where(s => s.Status == "Accepted").ToListAsync();
+            if (doc != null)
+            {
+                return doc;
+            }
+            return null;
+        }
 
         public Doctor DeleteDoctor(int doctorid)
         {
